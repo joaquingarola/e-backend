@@ -13,7 +13,7 @@ class Contenedor{
       
       products.push({...prod, id: id});
       await fs.promises.writeFile(`./files/${this.file}.txt`, JSON.stringify(products));
-      console.log("Producto agregado con éxito");
+      console.log(`Producto agregado con éxito, el ID asignado es: ${id}`);
     }
     catch(err){
       console.log("error", err);
@@ -66,7 +66,7 @@ class Contenedor{
 const test = () => {
 
   const productos = new Contenedor('Productos');
-  const obj1 = {name: 'Café', price: 480, thumbnail: 'https://prod'};
+  const obj1 = {name: 'Azúcar', price: 190, thumbnail: 'https://prod'};
  
   productos.save(obj1);
   /* productos.getAll(); */
