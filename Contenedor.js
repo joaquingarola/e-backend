@@ -33,7 +33,7 @@ class Contenedor{
   async getAll(){
     try{
       const data = await fs.promises.readFile(`./files/${this.file}.txt`, 'utf-8');
-      console.log(JSON.parse(data));
+      return JSON.parse(data);
     }
     catch(err){
       console.log("error", err);
@@ -63,16 +63,16 @@ class Contenedor{
   }
 }
 
-const test = () => {
+/* const test = async () => {
 
   const productos = new Contenedor('Productos');
-  const obj1 = {name: 'Azúcar', price: 190, thumbnail: 'https://prod'};
+  const obj1 = {name: 'Azúcar', price: 190, thumbnail: 'https://prod'}; 
  
-  productos.save(obj1);
-  /* productos.getAll(); */
-  /* productos.getById(1); */
-  /* productos.deleteById(1); */
-  /* productos.deleteAll(); */
-}
+  await productos.save(obj1);
+  await productos.getAll(); 
+  await productos.getById(1);
+  await productos.deleteById(1);
+  await productos.deleteAll();
+} */
 
-test();
+module.exports = Contenedor;
