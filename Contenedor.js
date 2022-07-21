@@ -13,7 +13,16 @@ class Contenedor{
       
       products.push({...prod, id: id});
       await fs.promises.writeFile(`./files/${this.file}.txt`, JSON.stringify(products));
-      console.log(`Producto agregado con éxito, el ID asignado es: ${id}`);
+      return id;
+    }
+    catch(err){
+      console.log("error", err);
+    }
+  }
+
+  async update(prods){
+    try{
+      await fs.promises.writeFile(`./files/${this.file}.txt`, JSON.stringify(prods));
     }
     catch(err){
       console.log("error", err);
@@ -23,10 +32,10 @@ class Contenedor{
   async getById(id){
     try{
       const data = await fs.promises.readFile(`./files/${this.file}.txt`, 'utf-8');
-      console.log(JSON.parse(data).find(p => p.id === id));
+      return JSON.parse(data).find(p => p.id === id) 
     }
     catch(err){
-      console.log("error", err);
+      console.log(err);
     }
   }
 
@@ -42,10 +51,14 @@ class Contenedor{
 
   async deleteById(id){
     try{
-      const data = await fs.promises.readFile(`./files/${this.file}.txt`, 'utf-8');
-      const products = JSON.parse(data);
-      await fs.promises.writeFile(`./files/${this.file}.txt`, JSON.stringify(products.filter(p => p.id !== id)));
-      console.log("Producto eliminado")
+      const prod = await this.getById(id);
+      if (prod){
+        const data = await fs.promises.readFile(`./files/${this.file}.txt`, 'utf-8');
+        const products = JSON.parse(data);
+        this.update(products.filter(p => p.id !== id));
+        return id;
+      }
+      return 0;
     }
     catch(err){
       console.log("error", err);
@@ -55,24 +68,11 @@ class Contenedor{
   async deleteAll(){
     try{
       await fs.promises.writeFile(`./files/${this.file}.txt`, '');
-      console.log("Productos eliminados")
     }
     catch(err){
       console.log("error", err);
     }
   }
 }
-
-/* const test = async () => {
-
-  const productos = new Contenedor('Productos');
-  const obj1 = {name: 'Azúcar', price: 190, thumbnail: 'https://prod'}; 
- 
-  await productos.save(obj1);
-  await productos.getAll(); 
-  await productos.getById(1);
-  await productos.deleteById(1);
-  await productos.deleteAll();
-} */
 
 module.exports = Contenedor;

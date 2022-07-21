@@ -1,1 +1,1 @@
-[{"name":"Monster","price":280,"thumbnail":"https://prod","id":1},{"name":"Café","price":480,"thumbnail":"https://prod","id":2},{"name":"Azúcar","price":190,"thumbnail":"https://prod","id":3}]
+[{"name":"Monster","price":"350","thumbnail":"https://prod","id":1},{"name":"Azúcar","price":190,"thumbnail":"https://prod","id":3},{"name":"Fideos","price":"249","thumbnail":"no tiene","id":4}]
