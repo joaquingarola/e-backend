@@ -1,0 +1,23 @@
+html
+    head 
+        title='Productos PUG'
+        link(rel="stylesheet" href="./style.css")
+        link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous")
+    body
+        div(class="main__container")
+            a(class="button" href='/')='Volver al inicio'
+        if prods !== undefined
+            div
+                table(class="table")
+                    tr
+                        th(class="text-center")='Nombre'
+                        th(class="text-center")='Precio'
+                        th(class="text-center")='Imagen'
+                    each p in prods
+                        tr
+                            td(class="text-center")=p.name
+                            td(class="text-center")='$' + p.price
+                            td(class="text-center")
+                                img(src=p.thumbnail)
+        else 
+            h2(style="text-align: center;")='No hay productos cargados.'

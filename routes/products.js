@@ -7,7 +7,7 @@ const routerProducts = new Router();
 routerProducts.get("/", async (req, res) => {
   try{
     let prods = await data.getAll();
-    res.send(prods);
+    res.render('products', {prods});
   } 
   catch(err){
     console.log("error", err);
@@ -31,8 +31,8 @@ routerProducts.get('/:id', async (req, res) =>{
 routerProducts.post('/', async (req, res) => {
   try {
     const add = req.body;
-    let id = await data.save(add);
-    res.json(`El ID del producto agregado es ${id}`)
+    await data.save(add);
+    res.redirect('/')
   } catch (e) {
     console.error(e);
   }
@@ -70,7 +70,6 @@ routerProducts.delete('/:id', async (req, res) => {
     } else{
       res.json({ error : 'Producto no encontrado' })
     }
-    
   } catch (e) {
     console.error(e);
   }
