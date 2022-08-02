@@ -6,7 +6,17 @@
 .form__container{
   display: flex;
   justify-content: center;
-  margin-top: 100px;
+  margin-top: 50px;
+}
+
+.form-group{
+  padding: 50px;
+  border-radius: 20px;
+  border: 1px solid rgb(214, 208, 208);
+  background-color: rgb(242, 242, 242);
+  box-shadow: 10px 9px 51px 6px rgba(0,0,0,0.64);
+  -webkit-box-shadow: 10px 9px 51px 6px rgba(0,0,0,0.64);
+  -moz-box-shadow: 10px 9px 51px 6px rgba(0,0,0,0.64);
 }
 
 .control__container{
