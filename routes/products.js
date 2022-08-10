@@ -1,7 +1,7 @@
 const { Router } = require("express")
 const Contenedor = require('../Contenedor.js');
 
-const data = new Contenedor('Productos');
+const data = new Contenedor('Products');
 const routerProducts = new Router();
 
 routerProducts.get("/", async (req, res) => {
