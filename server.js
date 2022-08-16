@@ -60,4 +60,4 @@ server.listen(PORT, ()=> {
   console.log(`Servidor en puerto: ${PORT}`)
 });
 
-server.on("Error", (error) => console.error(error));
+/* server.on("Error", (error) => console.error(error)); */
