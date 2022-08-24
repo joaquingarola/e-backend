@@ -1,28 +1,27 @@
 const fs = require('fs');
+const knex = require('knex');
+const knexConfig = require('./knexfile');
+const database = knex(knexConfig);
 
 class Contenedor{
-  constructor(file) {
-    this.file = file;
+  constructor(name) {
+    this.tableName = name;
   }
 
-  async save(prod){
+  async save(add){
     try{
-      const data = await fs.promises.readFile(`./files/${this.file}.txt`, 'utf-8');
-      const products = (data.length === 0) ? [] : JSON.parse(data);
-      let id = products.length ? products[products.length-1].id+1 : 1;
-      
-      products.push({...prod, id: id});
-      await fs.promises.writeFile(`./files/${this.file}.txt`, JSON.stringify(products));
-      return id;
+      const resultado = await database(this.tableName).insert(add);
+      return resultado;
     }
     catch(err){
       console.log("error", err);
     }
   }
 
-  async update(prods){
+  async update(update, id){
     try{
-      await fs.promises.writeFile(`./files/${this.file}.txt`, JSON.stringify(prods));
+      const result = await database(this.tableName).where(`${this.tableName}_id`, id).update(update);
+      return result;
     }
     catch(err){
       console.log("error", err);
@@ -31,8 +30,8 @@ class Contenedor{
 
   async getById(id){
     try{
-      const data = await fs.promises.readFile(`./files/${this.file}.txt`, 'utf-8');
-      return JSON.parse(data).find(p => p.id === id) 
+      const data = await database(this.tableName).select().where(`${this.tableName}_id`, id);
+      return data;
     }
     catch(err){
       console.log(err);
@@ -41,8 +40,8 @@ class Contenedor{
 
   async getAll(){
     try{
-      const data = await fs.promises.readFile(`./files/${this.file}.txt`, 'utf-8');
-      return JSON.parse(data);
+      const data = await database(this.tableName).select();
+      return data;
     }
     catch(err){
       console.log("error", err);
@@ -51,28 +50,13 @@ class Contenedor{
 
   async deleteById(id){
     try{
-      const prod = await this.getById(id);
-      if (prod){
-        const data = await fs.promises.readFile(`./files/${this.file}.txt`, 'utf-8');
-        const products = JSON.parse(data);
-        this.update(products.filter(p => p.id !== id));
-        return id;
-      }
-      return 0;
+      await database(this.tableName).where(`${this.tableName}_id`, id).del()
+      return 'Eliminado correctamente';
     }
     catch(err){
       console.log("error", err);
     }
   } 
-
-  async deleteAll(){
-    try{
-      await fs.promises.writeFile(`./files/${this.file}.txt`, '');
-    }
-    catch(err){
-      console.log("error", err);
-    }
-  }
 }
 
 module.exports = Contenedor;
