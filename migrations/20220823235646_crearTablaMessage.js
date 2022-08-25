@@ -7,7 +7,7 @@ exports.up = function(knex) {
     table.increments('message_id').primary().notNullable();
     table.string('message_email', 100).notNullable();
     table.string('message_content', 255).notNullable();
-    table.dateTime('message_date').notNullable();
+    table.timestamp('message_date').notNullable();
     table.string('message_socket_id', 45).notNullable();
   });
 };
