@@ -1,18 +1,18 @@
 const fs = require('fs');
 
-class Contenedor{
+class FileContainer{
   constructor(file) {
     this.file = file;
   }
 
   async save(prod){
     try{
-      const data = await fs.promises.readFile(`./files/${this.file}.txt`, 'utf-8');
+      const data = await fs.promises.readFile(this.file, 'utf-8');
       const products = (data.length === 0) ? [] : JSON.parse(data);
       let id = products.length ? products[products.length-1].id+1 : 1;
       
       products.push({...prod, id: id});
-      await fs.promises.writeFile(`./files/${this.file}.txt`, JSON.stringify(products));
+      await fs.promises.writeFile(this.file, JSON.stringify(products));
       return id;
     }
     catch(err){
@@ -22,7 +22,7 @@ class Contenedor{
 
   async update(prods){
     try{
-      await fs.promises.writeFile(`./files/${this.file}.txt`, JSON.stringify(prods));
+      await fs.promises.writeFile(this.file, JSON.stringify(prods));
     }
     catch(err){
       console.log("error", err);
@@ -31,8 +31,8 @@ class Contenedor{
 
   async getById(id){
     try{
-      const data = await fs.promises.readFile(`./files/${this.file}.txt`, 'utf-8');
-      return JSON.parse(data).find(p => p.id === id) 
+      const data = await fs.promises.readFile(this.file, 'utf-8');
+      return JSON.parse(data).find(p => p.id == id) 
     }
     catch(err){
       console.log(err);
@@ -41,7 +41,7 @@ class Contenedor{
 
   async getAll(){
     try{
-      const data = await fs.promises.readFile(`./files/${this.file}.txt`, 'utf-8');
+      const data = await fs.promises.readFile(this.file, 'utf-8');
       return JSON.parse(data);
     }
     catch(err){
@@ -53,9 +53,9 @@ class Contenedor{
     try{
       const prod = await this.getById(id);
       if (prod){
-        const data = await fs.promises.readFile(`./files/${this.file}.txt`, 'utf-8');
+        const data = await fs.promises.readFile(this.file, 'utf-8');
         const products = JSON.parse(data);
-        this.update(products.filter(p => p.id !== id));
+        this.update(products.filter(p => p.id != id));
         return id;
       }
       return 0;
@@ -67,7 +67,7 @@ class Contenedor{
 
   async deleteAll(){
     try{
-      await fs.promises.writeFile(`./files/${this.file}.txt`, '');
+      await fs.promises.writeFile(this.file, '');
     }
     catch(err){
       console.log("error", err);
@@ -75,4 +75,4 @@ class Contenedor{
   }
 }
 
-module.exports = Contenedor;
+module.exports = FileContainer;

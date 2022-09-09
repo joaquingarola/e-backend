@@ -1,8 +1,6 @@
 const { Router } = require("express")
-const Contenedor = require('../Contenedor.js');
+const data = require('../DAOs').productsDAO;
 const isAuthenticated = require('../Middleware/auth.js');
-
-const data = new Contenedor('Products');
 const routerProducts = new Router();
 
 routerProducts.get("/", async (req, res) => {
@@ -17,7 +15,7 @@ routerProducts.get("/", async (req, res) => {
 
 routerProducts.get('/:id', async (req, res) =>{
   try{
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     let prod = await data.getById(id);
     if(prod === undefined){
       res.status(404).json({ error : 'producto no encontrado' })
@@ -41,10 +39,10 @@ routerProducts.post('/', isAuthenticated, async (req, res) => {
 
 routerProducts.put('/:id', isAuthenticated, async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const update = req.body;
     const prods = await data.getAll();
-    let index = prods.findIndex((e) => e.id === id); 
+    let index = prods.findIndex((e) => e.id == id); 
     if (index !== -1) {
       if (update.name)
         prods[index].name = update.name;
@@ -58,7 +56,7 @@ routerProducts.put('/:id', isAuthenticated, async (req, res) => {
         prods[index].description = update.description;
       if (update.stock)
         prods[index].stock = update.stock;
-      await data.update(prods);
+      await data.update(prods, id);
       res.json('Producto actualizado con éxito');
     } else {
       res.status(404).json({ error : 'Producto no encontrado' })
@@ -70,7 +68,7 @@ routerProducts.put('/:id', isAuthenticated, async (req, res) => {
 
 routerProducts.delete('/:id', isAuthenticated, async (req, res) => {
   try{
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     let response = await data.deleteById(id);
     if(response !== 0){
       res.json(`Se ha eliminado con éxito el producto con ID: ${response}`);
