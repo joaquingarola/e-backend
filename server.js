@@ -1,4 +1,4 @@
-const routerProducts = require('./routes/products');
+const routerTest = require('./routes/test');
 const express = require('express');
 const app = express();
 const handlebars = require('express-handlebars');
@@ -6,9 +6,14 @@ const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
+const dotenv = require("dotenv");
+dotenv.config();
 
+const connectToMongoDB = require('./mongoDB/index');
+const { normalizeMsg } = require('./normalizr.js')
+const { MsgModel } = require("./mongoDB/schemas/message");
 const Contenedor = require("./Contenedor");
-const PORT = 3000;
+const PORT = 8000;
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -28,23 +33,23 @@ app.engine("hbs", hbs.engine);
 app.set('views', "./views");
 app.set("view engine", "hbs");
 
-let contenedor = new Contenedor("product");
-let contenedor2 = new Contenedor("message");
+let contenedor = new Contenedor(MsgModel);
+
+connectToMongoDB()
+  .then(() => console.log('Conectado con éxito a la base de datos'))
+  .catch((err) => console.log(`Error: ${err}`))
 
 io.on("connection", async (socket) => {
 
-  io.emit("update-messages", await contenedor2.getAll());
+  const message = await contenedor.getAll();
+  io.emit("update-messages", normalizeMsg(message));
 
-  socket.emit("products", await contenedor.getAll());
+  socket.emit("products");
 
   socket.on("post-message", async (msg) => {
-    const message = {
-      ...msg,
-      message_socket_id: socket.id
-    };
-    await contenedor2.save(message);
-
-    io.emit("update-messages", await contenedor2.getAll());
+    await contenedor.save(msg);
+    const message = await contenedor.getAll();
+    io.emit("update-messages", normalizeMsg(message));
   });
 });
 
@@ -52,10 +57,10 @@ app.get('/',(req, res) =>{
   res.render('main');
 });
 
-app.use("/products", routerProducts);
+app.use("/api/products-test", routerTest);
 
 server.listen(PORT, ()=> {
-  console.log(`Servidor en puerto: ${PORT}`)
+  console.log(`Servidor en puerto: ${PORT}`);
 });
 
 server.on("Error", (error) => console.error(error));
