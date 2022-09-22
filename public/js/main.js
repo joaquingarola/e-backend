@@ -4,17 +4,14 @@ socket.on("connect", () => {
   console.log("Conectado al servidor");
 });
 
-socket.on("products", () => {
-  let products;
-  fetch('http://localhost:8000/api/products-test')
-    .then(res => res.json())
-    .then(data => products = data)
+socket.on("products", async () => {
+  const data = await fetch('http://localhost:8000/api/products-test')
+  const products = await data.json();
   fetch("http://localhost:8000/products.hbs")
     .then((res) => res.text())
     .then((text) => {
       const template = Handlebars.compile(text);
       const html = template({ products: products });
-
       document.getElementById("products").innerHTML = html;
     });
 });
@@ -61,16 +58,32 @@ renderComp = (getMessages, denormMsg) => {
 }
 
 sendMessage = () => {
-  const message = {
-    author: {
-      email: document.getElementById("email").value,
-      name: document.getElementById("name").value,
-      lastname: document.getElementById("lastname").value,
-      age: document.getElementById("age").value,
-      username: document.getElementById("username").value,
-      avatar: document.getElementById("avatar").value,
-    },
-    text: document.getElementById("message").value,
-  };
-  socket.emit("post-message", message);
+  let user;
+  
+  fetch("/login")
+  .then(response => response.json())
+  .then(data => user = data.user)
+
+  if(user) {
+    const message = {
+      author: {
+        email: document.getElementById("email").value,
+        name: document.getElementById("name").value,
+        lastname: document.getElementById("lastname").value,
+        age: document.getElementById("age").value,
+        username: document.getElementById("username").value,
+        avatar: document.getElementById("avatar").value,
+      },
+      text: document.getElementById("message").value,
+    };
+    socket.emit("post-message", message);
+  }
 };
+
+fetch("/login")
+  .then(response => response.json())
+  .then(data => {
+    user = data.user;
+    document.getElementById("user").innerHTML = user;
+  })
+  .catch(error => console.log(error));
