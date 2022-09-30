@@ -59,7 +59,7 @@ renderComp = (getMessages, denormMsg) => {
 
 sendMessage = () => {
   let user;
-  
+
   fetch("/login")
   .then(response => response.json())
   .then(data => user = data.user)
@@ -79,6 +79,31 @@ sendMessage = () => {
     socket.emit("post-message", message);
   }
 };
+
+const botonEnviar = document.getElementById("botonEnviar");
+
+botonEnviar.addEventListener('click', async (e) => {
+  e.preventDefault();
+  
+  let session;
+  const data = await fetch("/login");
+  session = await data.json();
+
+  if(session.user) {
+    const message = {
+      author: {
+        email: document.getElementById("email").value,
+        name: document.getElementById("name").value,
+        lastname: document.getElementById("lastname").value,
+        age: document.getElementById("age").value,
+        username: document.getElementById("username").value,
+        avatar: document.getElementById("avatar").value,
+      },
+      text: document.getElementById("message").value,
+    };
+    socket.emit("post-message", message);
+  }
+})
 
 fetch("/login")
   .then(response => response.json())

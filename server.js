@@ -14,6 +14,12 @@ const { normalizeMsg } = require('./normalizr.js')
 const { MsgModel } = require("./mongoDB/schemas/message");
 const Contenedor = require("./Contenedor");
 
+const { Types } = require("mongoose");
+const User=require("./mongoDB/schemas/userSchema");
+const LocalStrategy = require('passport-local').Strategy;
+const passport = require("passport");
+const { comparePassword, hashPassword } = require("./utils/hashPassword");
+
 const session = require('express-session')
 const MongoStore = require('connect-mongo');
 const advancedOptions = { useNewUrlParser: true, useUnifiedTopology: true }
@@ -27,7 +33,7 @@ app.use(session({
   store: MongoStore.create({
     mongoUrl: `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@coder.nrxnhkn.mongodb.net/ecommerce?retryWrites=true&w=majority`,
     mongoOptions: advancedOptions,
-    ttl: 60,
+    ttl: 60 * 10,
     retries: 0
   }),
   secret: "secret",
@@ -49,6 +55,9 @@ app.engine("hbs", hbs.engine);
 app.set('views', "./views");
 app.set("view engine", "hbs");
 
+app.use(passport.initialize())
+app.use(passport.session())
+
 let contenedor = new Contenedor(MsgModel);
 
 connectToMongoDB()
@@ -69,6 +78,48 @@ io.on("connection", async (socket) => {
   });
 });
 
+app.use(passport.initialize());
+app.use(passport.session());
+
+//Login user
+
+passport.use("login", new LocalStrategy(async (username, password, done) => {
+  const user = await User.findOne({ username });
+
+  if(user) {
+    const passHash = user.password;
+    if(!comparePassword(password, passHash))
+      return done(null, null, { message: "Invalid username or password" });
+  } else
+    return done(null, null, { message: "Invalid username or password" });
+
+  return done(null, user);
+}));
+
+//Registro user
+
+passport.use("signup", new LocalStrategy({ passReqToCallback: true }, async (req, username, password, done) => {
+  const user = await User.findOne({ username });
+  if (user) {
+   return done(new Error("El usuario ya existe!"),
+   null);
+  };
+  const hashedPassword = hashPassword(password);
+  const newUser = new User({ username, password: hashedPassword  });
+  await newUser.save();
+  return done(null, newUser);
+}));
+
+passport.serializeUser((user, done) => {
+  done(null, user._id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  id = Types.ObjectId(id);
+  const user = await User.findById(id);
+  done(null, user);
+});
+
 app.get('/',(req, res) =>{
   try {
     if (req.session.user) {
@@ -81,29 +132,49 @@ app.get('/',(req, res) =>{
   }
 });
 
-app.post('/login', (req, res) => {
-  req.session.user = req.body.user;
+app.post("/login", passport.authenticate("login", { failureRedirect: "/loginFail"}), (req, res) => {
+  req.session.user = req.user;
   res.redirect('/');
 });
 
 app.get('/login', (req, res) => {
-  if (req.session.user) {
-    const user = req.session.user;
-    res.send({ user })
+  if (req.session.user.username) {
+    const usuario = req.session.user.username;
+    res.send({ user: usuario })
   } else {
-    res.send({ userName: 'No existe' })
+    res.send({ user: 'No existe' })
   }
 });
 
 app.get('/logout', (req, res) => {
-  const user = req.session.user;
+  const user = req.session ? req.session.user.username : undefined;
   req.session.destroy((err) => {
     if (err) {
       console.log(err);
     } else {
-      res.render('logout', {user: user});
+      if(user)
+        res.render('logout', {user: user});
+      else
+        res.redirect('/');
     }
   });
+});
+
+app.post("/signup", passport.authenticate("signup", { failureRedirect: "/signupFail"}), (req, res) => {  
+  req.session.user = req.user;
+  res.redirect("/login");
+});
+
+app.get('/signup', (req, res) => {
+  res.render('register');
+});
+
+app.get("/loginFail", (req, res) => {
+  res.render('loginFailed');
+});
+
+app.get("/signupFail", (req, res) => {
+  res.render('registerFailed');
 });
 
 app.use("/api/products-test", routerTest);
