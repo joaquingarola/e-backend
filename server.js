@@ -1,4 +1,5 @@
 const routerTest = require('./routes/test.js');
+const routerRandom = require('./routes/random.js');
 const express = require('express');
 const app = express();
 const handlebars = require('express-handlebars');
@@ -6,6 +7,7 @@ const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
+const info = require("./utils/info");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -162,7 +164,7 @@ app.get('/logout', (req, res) => {
 
 app.post("/signup", passport.authenticate("signup", { failureRedirect: "/signupFail"}), (req, res) => {  
   req.session.user = req.user;
-  res.redirect("/login");
+  res.redirect("/");
 });
 
 app.get('/signup', (req, res) => {
@@ -177,7 +179,15 @@ app.get("/signupFail", (req, res) => {
   res.render('registerFailed');
 });
 
+app.get("/info", (req, res) => {
+  if(req.session.user)
+    res.render('info', info)
+  else
+    res.redirect("/");
+});
+
 app.use("/api/products-test", routerTest);
+app.use('/api/random', routerRandom) 
 
 server.listen(PORT, ()=> {
   console.log(`Servidor en puerto: ${PORT}`);
