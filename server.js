@@ -189,8 +189,10 @@ app.get("/info", (req, res) => {
 app.use("/api/products-test", routerTest);
 app.use('/api/random', routerRandom) 
 
-server.listen(PORT, ()=> {
-  console.log(`Servidor en puerto: ${PORT}`);
+const p = require('./utils/minimist')
+
+server.listen(p.p, () => {
+  console.log(`Server listening :: http://localhost:${p.p}`);
 });
 
 server.on("Error", (error) => console.error(error));
