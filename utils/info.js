@@ -1,3 +1,5 @@
+const numCpus=require('os').cpus().length
+
 const info = {
   title: process.title,
   platform: process.platform,
@@ -5,7 +7,8 @@ const info = {
   memory: process.memoryUsage().rss,
   path: process.execPath,
   pid: process.pid,
-  folder: process.cwd()
+  folder: process.cwd(),
+  numCpus: numCpus
 };
 
 module.exports = info;

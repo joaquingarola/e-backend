@@ -9,6 +9,8 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 const info = require("./utils/info");
 const dotenv = require("dotenv");
+const cluster=require('cluster')
+const numCpus=require('os').cpus().length
 dotenv.config();
 
 const connectToMongoDB = require('./mongoDB/index');
@@ -122,6 +124,9 @@ passport.deserializeUser(async (id, done) => {
   done(null, user);
 });
 
+
+
+
 app.get('/',(req, res) =>{
   try {
     if (req.session.user) {
@@ -186,13 +191,13 @@ app.get("/info", (req, res) => {
     res.redirect("/");
 });
 
+server.listen(p.p, () => {
+  console.log(`Server listening :: http://localhost:${p.p} - procesador: ${process.pid}`);
+});
+
 app.use("/api/products-test", routerTest);
 app.use('/api/random', routerRandom) 
 
 const p = require('./utils/minimist')
-
-server.listen(p.p, () => {
-  console.log(`Server listening :: http://localhost:${p.p}`);
-});
 
 server.on("Error", (error) => console.error(error));
