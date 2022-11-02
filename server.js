@@ -9,8 +9,12 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 const info = require("./utils/info");
 const dotenv = require("dotenv");
-const cluster=require('cluster')
-const numCpus=require('os').cpus().length
+const cluster=require('cluster');
+const numCpus=require('os').cpus().length;
+const compression = require('compression');
+const gzipMiddleware = compression();
+const logger = require('./utils/loggerConfig.js');
+
 dotenv.config();
 
 const connectToMongoDB = require('./mongoDB/index');
@@ -65,8 +69,8 @@ app.use(passport.session())
 let contenedor = new Contenedor(MsgModel);
 
 connectToMongoDB()
-  .then(() => console.log('Conectado con éxito a la base de datos'))
-  .catch((err) => console.log(`Error: ${err}`))
+  .then(() => logger.log('info','Conectado con éxito a la base de datos'))
+  .catch((err) => logger.log('error',`Error: ${err}`))
 
 io.on("connection", async (socket) => {
 
@@ -129,13 +133,14 @@ passport.deserializeUser(async (id, done) => {
 
 app.get('/',(req, res) =>{
   try {
+    logger.log('info', `Ruta ${req.url}`)
     if (req.session.user) {
       res.render('main');
     } else {
       res.render('login');
     }
   } catch (err) {
-      console.log(err);
+      logger.log('error', err);
   }
 });
 
@@ -157,7 +162,7 @@ app.get('/logout', (req, res) => {
   const user = req.session ? req.session.user.username : undefined;
   req.session.destroy((err) => {
     if (err) {
-      console.log(err);
+      logger.log('error', err);
     } else {
       if(user)
         res.render('logout', {user: user});
@@ -185,19 +190,37 @@ app.get("/signupFail", (req, res) => {
 });
 
 app.get("/info", (req, res) => {
-  if(req.session.user)
+  if(req.session.user){
     res.render('info', info)
+    logger.log('info', 'Ruta exitosa');
+  }
   else
     res.redirect("/");
 });
 
+app.get("/infozip", gzipMiddleware,(req, res) => {
+  if(req.session.user){
+    logger.log('info', 'Ruta exitosa');
+    res.render('info', info)
+  }
+  else
+    res.redirect("/");
+});
+
+app.get('/*', (req, res) => {
+  logger.log("warn", `Ruta no encontrada ${req.url}`);
+  res.status(404).send(`Ruta no encontrada ${req.url}`);
+})
+
+const p = require('./utils/minimist');
+
 server.listen(p.p, () => {
-  console.log(`Server listening :: http://localhost:${p.p} - procesador: ${process.pid}`);
+  logger.log('info',`Server listening :: http://localhost:${p.p} - procesador: ${process.pid}`);
 });
 
 app.use("/api/products-test", routerTest);
 app.use('/api/random', routerRandom) 
 
-const p = require('./utils/minimist')
 
-server.on("Error", (error) => console.error(error));
+
+server.on("Error", (error) => logger.log('error',error));

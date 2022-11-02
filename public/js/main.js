@@ -1,7 +1,7 @@
 const socket = io();
 
 socket.on("connect", () => {
-  console.log("Conectado al servidor");
+  logger.log('info',"Conectado al servidor");
 });
 
 socket.on("products", async () => {
@@ -111,4 +111,4 @@ fetch("/login")
     user = data.user;
     document.getElementById("user").innerHTML = user;
   })
-  .catch(error => console.log(error));
+  .catch(error => logger.log('error',error));

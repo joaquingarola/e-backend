@@ -8,7 +8,7 @@ class Contenedor{
       const obj = await new this.Schema(object).save()
       return obj.id
     } catch (err) {
-      console.log(err)
+      logger.log('error',err)
     }
   }
 
@@ -16,7 +16,7 @@ class Contenedor{
     try {
       return await this.Schema.find();
     } catch (err) {
-      console.error(err)
+      logger.log('error',err)
     }
   }
 

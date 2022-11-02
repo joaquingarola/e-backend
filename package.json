@@ -4,9 +4,8 @@
   "description": "Proyecto desarrollado durante el curso de backend en CoderHouse",
   "main": "Contenedor.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "migrate": "npx knex migrate:latest"
+    "test": "node benchmark.js",
+    "start": "0x server.js"
   },
   "repository": {
     "type": "git",
@@ -24,7 +23,9 @@
     "nodemon": "^2.0.19"
   },
   "dependencies": {
+    "autocannon": "^7.10.0",
     "bcrypt": "^5.0.1",
+    "compression": "^1.7.4",
     "connect-mongo": "^4.6.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
@@ -38,6 +39,7 @@
     "normalizr": "^3.6.2",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
-    "socket.io": "^4.5.1"
+    "socket.io": "^4.5.1",
+    "winston": "^3.8.2"
   }
 }
