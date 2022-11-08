@@ -31,7 +31,6 @@ const { comparePassword, hashPassword } = require("./utils/hashPassword");
 const session = require('express-session')
 const MongoStore = require('connect-mongo');
 const advancedOptions = { useNewUrlParser: true, useUnifiedTopology: true }
-const PORT = 8000;
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -214,8 +213,8 @@ app.get('/*', (req, res) => {
 
 const p = require('./utils/minimist');
 
-server.listen(p.p, () => {
-  logger.log('info',`Server listening :: http://localhost:${p.p} - procesador: ${process.pid}`);
+server.listen(process.env.PORT, () => {
+  // logger.log('info',`Server listening :: http://localhost:${p.p} - procesador: ${process.pid}`);
 });
 
 app.use("/api/products-test", routerTest);
