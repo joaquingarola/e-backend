@@ -213,9 +213,7 @@ app.get('/*', (req, res) => {
 
 const p = require('./utils/minimist');
 
-server.listen(process.env.PORT, () => {
-  // logger.log('info',`Server listening :: http://localhost:${p.p} - procesador: ${process.pid}`);
-});
+server.listen(process.env.PORT);
 
 app.use("/api/products-test", routerTest);
 app.use('/api/random', routerRandom) 
