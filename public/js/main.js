@@ -1,7 +1,7 @@
 const socket = io();
 
 socket.on("connect", () => {
-  logger.log('info',"Conectado al servidor");
+  console.log("Conectado al servidor");
 });
 
 socket.on("products", async () => {

@@ -211,13 +211,10 @@ app.get('/*', (req, res) => {
   res.status(404).send(`Ruta no encontrada ${req.url}`);
 })
 
-app.set('port', (process.env.PORT || 5000));
+const p = require('./utils/minimist');
 
-app.get('/', function(request, response) {
-  var result = 'App is running'
-  response.send(result);
-}).listen(app.get('port'), function() {
-  console.log('App is running, server is listening on port ', app.get('port'));
+server.listen(process.env.PORT || p.p, () => {
+  logger.log('info',`Server listening :: http://localhost:${process.env.PORT} - procesador: ${process.pid}`);
 });
 
 app.use("/api/products-test", routerTest);
